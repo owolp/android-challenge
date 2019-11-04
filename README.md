@@ -1,7 +1,8 @@
 # Android Coding Challenge
 
 Create a full search experience from scratch using the Github API
-https://developer.github.com/v3/search/#search-repositories
+
+[https://developer.github.com/v3/search/#search-repositories](https://developer.github.com/v3/search/#search-repositories)
 
 This search experience will include:
 
