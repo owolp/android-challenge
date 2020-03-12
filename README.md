@@ -21,7 +21,7 @@ Add something to a list item that allows you to delete that item. The API will a
 Bonus: animate the list item removal so that the other items move in to its place gracefully.
 
 #### 4. Fix broken tests
-There are some unit tests and some Espresso tests that are broken, fix them.
+There are some unit tests that are broken, fix them.
 
 #### 5. (Bonus) Delete a post from the post details screen
 The behaviour of this action is up to you. A couple of ideas could be:
