@@ -3,6 +3,9 @@ package com.syftapp.codetest.data.api
 import com.syftapp.codetest.data.model.api.*
 import io.reactivex.Single
 
+/**
+ * Provides some dummy data that you would expect to get back from the [BlogService]
+ */
 class StubBlogService : BlogService {
 
     override fun getUsers(): Single<List<User>> {
