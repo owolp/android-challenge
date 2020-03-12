@@ -8,7 +8,7 @@ Make sure you **add unit tests** for code that you write!
 In no particular order, the tasks are:
 
 #### 1. Add pagination
-The source data comes from [here][https://jsonplaceholder.typicode.com/posts] so you can tweak the URL to read `?_page=2&_limit=20` (for example) to make the data paginated.
+The source data comes from [here](https://jsonplaceholder.typicode.com/posts) so you can tweak the URL to read `?_page=2&_limit=20` (for example) to make the data paginated.
 
 Bonus: leave some comments in the code around this specific way of paginating, and if there are any issues you can see by fetching "page 1", "page 2", and limiting.
 
