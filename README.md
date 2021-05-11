@@ -12,10 +12,7 @@ The source data comes from [here](https://jsonplaceholder.typicode.com/posts) so
 
 Bonus: leave some comments in the code around this specific way of paginating, and if there are any issues you can see by fetching "page 1", "page 2", and limiting.
 
-#### 2. Animate new items coming in
-New items being added to the recyclerview should animate in when a new page is loaded.
-
-#### 3. Fix broken tests
+#### 2. Fix broken tests
 There are some unit tests that are broken, fix them.
 
 
