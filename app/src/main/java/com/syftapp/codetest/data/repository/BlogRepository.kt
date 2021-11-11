@@ -73,6 +73,8 @@ class BlogRepository(
      *
      * Upon subscribe emit data from local, retrieve data from remote and insert it, and then emit
      * data from local again
+     *
+     * In case of exception during any of the data retrieval emit error
      */
     private fun <T> fetchDataObservable(
         local: () -> Observable<List<T>>,
@@ -94,6 +96,8 @@ class BlogRepository(
                         emitter.onNext(updatedList)
                         emitter.onComplete()
                     }
+                }.onExceptionResumeNext {
+                    emitter.onError(Exception())
                 }
                 .subscribe()
         }
