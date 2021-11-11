@@ -57,7 +57,7 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         val scrollListener = object :
             EndlessRecyclerViewScrollListener(listOfPosts.layoutManager as LinearLayoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                // TODO: load more items from presenter
+                presenter.loadPosts(page + 1)
             }
         }
         listOfPosts.addOnScrollListener(scrollListener)

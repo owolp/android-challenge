@@ -33,7 +33,7 @@ class PostsPresenterTest {
 
     @Test
     fun `binding loads posts`() {
-        every { getPostsUseCase.execute() } returns Single.just(listOf(anyPost))
+        every { getPostsUseCase.execute(0) } returns Single.just(listOf(anyPost))
 
         sut.bind(view)
 
@@ -46,7 +46,7 @@ class PostsPresenterTest {
 
     @Test
     fun `error on binding shows error state after loading`() {
-        every { getPostsUseCase.execute() } returns Single.error(Throwable())
+        every { getPostsUseCase.execute(0) } returns Single.error(Throwable())
 
         sut.bind(view)
 

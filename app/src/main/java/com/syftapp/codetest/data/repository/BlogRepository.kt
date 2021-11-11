@@ -35,10 +35,10 @@ class BlogRepository(
         )
     }
 
-    override fun getPosts(): Single<List<Post>> {
+    override fun getPosts(page: Int): Single<List<Post>> {
         return fetchData(
             local = { postDao.getAll() },
-            remote = { blogApi.getPosts() },
+            remote = { blogApi.getPosts(page) },
             insert = { value -> postDao.insertAll(*value.toTypedArray()) }
         )
     }

@@ -17,6 +17,10 @@ import org.junit.Test
 
 class BlogRepositoryTest {
 
+    companion object {
+        private const val INITIAL_PAGE = 0
+    }
+
     @RelaxedMockK
     lateinit var postDao: PostDao
     @RelaxedMockK
@@ -49,20 +53,20 @@ class BlogRepositoryTest {
     fun `get posts returns cached values if available`() {
         every { postDao.getAll() } returns Single.just(listOf(anyPost))
 
-        val observer = sut.getPosts().test()
+        val observer = sut.getPosts(INITIAL_PAGE).test()
         observer.assertValue(listOf(anyPost))
-        verify(exactly = 0) { blogApi.getPosts() }
+        verify(exactly = 0) { blogApi.getPosts(INITIAL_PAGE) }
     }
 
     @Test
     fun `posts value fetched from api is inserted to the cache`() {
         every { postDao.getAll() } returns Single.just(listOf())
-        every { blogApi.getPosts() } returns Single.just(listOf(anyPost))
+        every { blogApi.getPosts(INITIAL_PAGE) } returns Single.just(listOf(anyPost))
 
-        sut.getPosts().test()
+        sut.getPosts(INITIAL_PAGE).test()
 
         verify {
-            blogApi.getPosts()
+            blogApi.getPosts(INITIAL_PAGE)
             postDao.insertAll(*listOf(anyPost).toTypedArray())
         }
     }
@@ -84,10 +88,10 @@ class BlogRepositoryTest {
     fun `value from api is returned to caller`() {
         every { userDao.getAll() } returns Single.just(listOf())
         every { postDao.getAll() } returns Single.just(listOf())
-        every { blogApi.getPosts() } returns Single.just(listOf(anyPost))
+        every { blogApi.getPosts(INITIAL_PAGE) } returns Single.just(listOf(anyPost))
         every { blogApi.getUsers() } returns Single.just(listOf(anyUser))
 
-        val postObserver = sut.getPosts().test()
+        val postObserver = sut.getPosts(INITIAL_PAGE).test()
         val userObserver = sut.getUsers().test()
 
         postObserver.assertValue(listOf(anyPost))
@@ -96,11 +100,12 @@ class BlogRepositoryTest {
 
     @Test
     fun `api failing returns reactive error on chain`() {
+        val page = 0
         every { postDao.getAll() } returns Single.just(listOf())
         val error = Throwable()
-        every { blogApi.getPosts() } throws error
+        every { blogApi.getPosts(page) } throws error
 
-        val observer = sut.getPosts().test()
+        val observer = sut.getPosts(page).test()
 
         observer.assertError(error)
     }
