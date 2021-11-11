@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.syftapp.codetest.Navigation
 import com.syftapp.codetest.R
 import com.syftapp.codetest.data.model.domain.Post
-import kotlinx.android.synthetic.main.activity_posts.*
+import kotlinx.android.synthetic.main.activity_posts.error
+import kotlinx.android.synthetic.main.activity_posts.listOfPosts
+import kotlinx.android.synthetic.main.activity_posts.loading
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 
@@ -24,9 +26,7 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         setContentView(R.layout.activity_posts)
         navigation = Navigation(this)
 
-        listOfPosts.layoutManager = LinearLayoutManager(this)
-        val separator = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        listOfPosts.addItemDecoration(separator)
+        setupRecyclerView()
 
         presenter.bind(this)
     }
@@ -46,6 +46,14 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         }
     }
 
+    private fun setupRecyclerView() {
+        listOfPosts.layoutManager = LinearLayoutManager(this)
+        val separator = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        listOfPosts.addItemDecoration(separator)
+        adapter = PostsAdapter(presenter)
+        listOfPosts.adapter = adapter
+    }
+
     private fun showLoading() {
         error.visibility = View.GONE
         listOfPosts.visibility = View.GONE
@@ -57,11 +65,7 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
     }
 
     private fun showPosts(posts: List<Post>) {
-        // this is a fairly crude implementation, if it was Flowable, it would
-        // be better to use DiffUtil and consider notifyRangeChanged, notifyItemInserted, etc
-        // to preserve animations on the RecyclerView
-        adapter = PostsAdapter(posts, presenter)
-        listOfPosts.adapter = adapter
+        adapter.submitList(posts)
         listOfPosts.visibility = View.VISIBLE
     }
 
