@@ -75,7 +75,8 @@ class BlogRepository(
      * Upon subscribe emit data from local, retrieve data from remote and insert it, and then emit
      * data from local again
      *
-     * In case of exception during any of the data retrieval emit error
+     * In case of an exception during any of the data retrieval emit values from local
+     * In case of an error during any of the data retrieval emit error
      */
     @SuppressLint("CheckResult")
     private fun <T> fetchDataObservable(
@@ -99,7 +100,12 @@ class BlogRepository(
                         emitter.onComplete()
                     }
                 }.onExceptionResumeNext {
-                    emitter.onError(Exception())
+                    local.invoke()
+                        .map { offlineList ->
+                            if (!emitter.isDisposed) {
+                                emitter.onNext(offlineList)
+                            }
+                        }
                 }.subscribe({}, { emitter.onError(it) })
         }
     }
