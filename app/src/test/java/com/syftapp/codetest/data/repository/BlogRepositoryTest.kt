@@ -11,10 +11,10 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 class BlogRepositoryTest {
@@ -37,7 +37,8 @@ class BlogRepositoryTest {
     }
 
     private val anyUser = User(1, "name", "username", "email")
-    private val anyPost = Post(1, 1, "title", "body")
+    private val anyPost1 = Post(1, 1, "title1", "body1")
+    private val anyPost2 = Post(2, 2, "title2", "body2")
 
     @Before
     fun setup() = MockKAnnotations.init(this)
@@ -51,26 +52,33 @@ class BlogRepositoryTest {
         verify(exactly = 0) { blogApi.getUsers() }
     }
 
-    @Ignore("Fix by testing fetchDataObservable")
     @Test
-    fun `get posts returns cached values if available`() {
-        every { postDao.getAll() } returns Single.just(listOf(anyPost))
+    fun `get posts emits cached values, retrieves remote values, saves remote values and emits new cached values`() {
+        every { postDao.getAll() } returnsMany listOf(
+            Single.just(listOf(anyPost1)),
+            Single.just(listOf(anyPost2))
+        )
+        every { postDao.insertAll(anyPost1) } returns Completable.complete()
+        every { postDao.insertAll(anyPost2) } returns Completable.complete()
+        every { blogApi.getPosts(INITIAL_PAGE) } returns Observable.just(listOf(anyPost2))
 
-        val observer = sut.getPosts(INITIAL_PAGE).test()
-        observer.assertValue(listOf(anyPost))
-        verify(exactly = 0) { blogApi.getPosts(INITIAL_PAGE) }
+        val testObserver = sut.getPosts(INITIAL_PAGE).test()
+
+        testObserver.assertValues(listOf(anyPost1), listOf(anyPost2))
+        verify(exactly = 2) { postDao.getAll() }
+        verify(exactly = 1) { blogApi.getPosts(INITIAL_PAGE) }
     }
 
     @Test
     fun `posts value fetched from api is inserted to the cache`() {
         every { postDao.getAll() } returns Single.just(listOf())
-        every { blogApi.getPosts(INITIAL_PAGE) } returns Observable.just(listOf(anyPost))
+        every { blogApi.getPosts(INITIAL_PAGE) } returns Observable.just(listOf(anyPost1))
 
         sut.getPosts(INITIAL_PAGE).test()
 
         verify {
             blogApi.getPosts(INITIAL_PAGE)
-            postDao.insertAll(*listOf(anyPost).toTypedArray())
+            postDao.insertAll(*listOf(anyPost1).toTypedArray())
         }
     }
 
@@ -87,22 +95,6 @@ class BlogRepositoryTest {
         }
     }
 
-    @Ignore("Fix by testing fetchDataObservable")
-    @Test
-    fun `value from api is returned to caller`() {
-        every { userDao.getAll() } returns Single.just(listOf())
-        every { postDao.getAll() } returns Single.just(listOf())
-        every { blogApi.getPosts(INITIAL_PAGE) } returns Observable.just(listOf(anyPost))
-        every { blogApi.getUsers() } returns Single.just(listOf(anyUser))
-
-        val postObserver = sut.getPosts(INITIAL_PAGE).test()
-        val userObserver = sut.getUsers().test()
-
-        postObserver.assertValue(listOf(anyPost))
-        userObserver.assertValue(listOf(anyUser))
-    }
-
-    @Ignore("Fix by testing fetchDataObservable")
     @Test
     fun `api failing returns reactive error on chain`() {
         val page = 0

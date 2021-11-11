@@ -1,5 +1,6 @@
 package com.syftapp.codetest.data.repository
 
+import android.annotation.SuppressLint
 import com.syftapp.codetest.data.api.BlogApi
 import com.syftapp.codetest.data.dao.CommentDao
 import com.syftapp.codetest.data.dao.PostDao
@@ -76,6 +77,7 @@ class BlogRepository(
      *
      * In case of exception during any of the data retrieval emit error
      */
+    @SuppressLint("CheckResult")
     private fun <T> fetchDataObservable(
         local: () -> Observable<List<T>>,
         remote: () -> Observable<List<T>>,
@@ -98,8 +100,7 @@ class BlogRepository(
                     }
                 }.onExceptionResumeNext {
                     emitter.onError(Exception())
-                }
-                .subscribe()
+                }.subscribe({}, { emitter.onError(it) })
         }
     }
 }
