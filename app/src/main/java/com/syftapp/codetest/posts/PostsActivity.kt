@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.syftapp.codetest.Navigation
 import com.syftapp.codetest.R
 import com.syftapp.codetest.data.model.domain.Post
@@ -52,6 +53,14 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         listOfPosts.addItemDecoration(separator)
         adapter = PostsAdapter(presenter)
         listOfPosts.adapter = adapter
+
+        val scrollListener = object :
+            EndlessRecyclerViewScrollListener(listOfPosts.layoutManager as LinearLayoutManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                // TODO: load more items from presenter
+            }
+        }
+        listOfPosts.addOnScrollListener(scrollListener)
     }
 
     private fun showLoading() {
