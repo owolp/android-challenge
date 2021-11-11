@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verifyOrder
+import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -33,7 +34,7 @@ class PostsPresenterTest {
 
     @Test
     fun `binding loads posts`() {
-        every { getPostsUseCase.execute(0) } returns Single.just(listOf(anyPost))
+        every { getPostsUseCase.execute(0) } returns Observable.just(listOf(anyPost))
 
         sut.bind(view)
 
@@ -46,7 +47,7 @@ class PostsPresenterTest {
 
     @Test
     fun `error on binding shows error state after loading`() {
-        every { getPostsUseCase.execute(0) } returns Single.error(Throwable())
+        every { getPostsUseCase.execute(0) } returns Observable.error(Throwable())
 
         sut.bind(view)
 

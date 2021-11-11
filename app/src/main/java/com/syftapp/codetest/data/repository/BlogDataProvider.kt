@@ -3,6 +3,7 @@ package com.syftapp.codetest.data.repository
 import com.syftapp.codetest.data.model.domain.Comment
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.data.model.domain.User
+import io.reactivex.Observable
 import io.reactivex.Single
 
 interface BlogDataProvider {
@@ -11,6 +12,6 @@ interface BlogDataProvider {
 
     fun getComments(): Single<List<Comment>>
 
-    fun getPosts(page: Int): Single<List<Post>>
+    fun getPosts(page: Int): Observable<List<Post>>
 
 }

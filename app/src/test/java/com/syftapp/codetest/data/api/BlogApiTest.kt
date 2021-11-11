@@ -3,6 +3,7 @@ package com.syftapp.codetest.data.api
 import com.syftapp.codetest.data.model.domain.Comment
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.data.model.domain.User
+import io.reactivex.Observable
 import io.reactivex.Single
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -32,7 +33,7 @@ class BlogApiTest {
     @Test
     fun `get posts contains correct domain models`() {
         val apiPost = rxValue(blogService.getPosts(0, 20)).get(0)
-        val posts = rxValue(sut.getPosts(0))
+        val posts = rxValueObservable(sut.getPosts(0))
 
         assertThat(posts)
             .hasSize(5)
@@ -65,4 +66,6 @@ class BlogApiTest {
     }
 
     private fun <T> rxValue(apiItem: Single<T>): T = apiItem.test().values().get(0)
+
+    private fun <T> rxValueObservable(apiItem: Observable<T>): T = apiItem.test().values().get(0)
 }

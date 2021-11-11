@@ -9,6 +9,7 @@ import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.data.model.domain.User
 import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.Observable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 
@@ -35,9 +36,9 @@ class BlogRepository(
         )
     }
 
-    override fun getPosts(page: Int): Single<List<Post>> {
-        return fetchData(
-            local = { postDao.getAll() },
+    override fun getPosts(page: Int): Observable<List<Post>> {
+        return fetchDataObservable(
+            local = { postDao.getAll().toObservable() },
             remote = { blogApi.getPosts(page) },
             insert = { value -> postDao.insertAll(*value.toTypedArray()) }
         )
@@ -65,5 +66,36 @@ class BlogRepository(
                         }
                 }
             }
+    }
+
+    /**
+     * Single source of truth is always local
+     *
+     * Upon subscribe emit data from local, retrieve data from remote and insert it, and then emit
+     * data from local again
+     */
+    private fun <T> fetchDataObservable(
+        local: () -> Observable<List<T>>,
+        remote: () -> Observable<List<T>>,
+        insert: (insertValue: List<T>) -> Completable
+    ): Observable<List<T>> {
+
+        return Observable.create { emitter ->
+            local.invoke()
+                .flatMap { offlineList ->
+                    if (!emitter.isDisposed) {
+                        emitter.onNext(offlineList)
+                    }
+                    remote.invoke()
+                }.flatMapCompletable { remoteList ->
+                    insert.invoke(remoteList)
+                }.andThen(local.invoke()).map { updatedList ->
+                    if (!emitter.isDisposed) {
+                        emitter.onNext(updatedList)
+                        emitter.onComplete()
+                    }
+                }
+                .subscribe()
+        }
     }
 }
