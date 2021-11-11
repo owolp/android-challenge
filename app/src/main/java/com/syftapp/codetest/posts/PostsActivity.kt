@@ -65,7 +65,6 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
 
     private fun showLoading() {
         error.visibility = View.GONE
-        listOfPosts.visibility = View.GONE
         loading.visibility = View.VISIBLE
     }
 
@@ -74,12 +73,14 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
     }
 
     private fun showPosts(posts: List<Post>) {
+        error.visibility = View.GONE
+        loading.visibility = View.GONE
         adapter.submitList(posts)
-        listOfPosts.visibility = View.VISIBLE
     }
 
     private fun showError(message: String) {
         if (adapter.currentList.isEmpty()) {
+            listOfPosts.visibility = View.GONE
             error.visibility = View.VISIBLE
             error.setText(message)
         }
