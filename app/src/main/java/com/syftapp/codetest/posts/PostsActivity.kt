@@ -52,6 +52,8 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         val separator = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         listOfPosts.addItemDecoration(separator)
         adapter = PostsAdapter(presenter)
+        adapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         listOfPosts.adapter = adapter
 
         val scrollListener = object :
