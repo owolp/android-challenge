@@ -3,14 +3,13 @@ package com.syftapp.codetest.data.api
 import com.syftapp.codetest.data.model.domain.Comment
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.data.model.domain.User
-import io.mockk.mockk
 import io.reactivex.Single
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class BlogApiTest {
 
-    private val blogService = mockk<BlogService>()
+    private val blogService = StubBlogService()
     private val sut = BlogApi(blogService)
 
     @Test
